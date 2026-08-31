@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atendimento - Distribuidora de Pães</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            box-sizing: border-box;
+        }
+        h2 {
+            color: #d35400;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        p {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+        
+        /* Formulários e Inputs */
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        /* Grades e Botões */
+        .grid-1 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .btn-opcao {
+            background-color: #fff9f0;
+            border: 2px solid #f39c12;
+            border-radius: 10px;
+            padding: 15px 10px; 
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-opcao:hover { background-color: #f39c12; color: white; }
+        
+        .btn-acao {
+            background-color: #d35400;
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-acao:hover { background-color: #e67e22; }
+
+        .btn-voltar {
+            background: none;
+            border: none;
+            color: #999;
+            text-decoration: underline;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🍞 Bem vindo ao Atendimento da Dona Ceiça Congelados 🍞 </h2>
+
+        <!-- TELA 1: Identificação -->
+        <div id="tela-identificacao">
+            <p>Para começarmos, por favor, informe seus dados:</p>
+            <input type="text" id="input-nome" placeholder="Seu Nome ou Nome Social" required>
+            <input type="text" id="input-documento" placeholder="Seu CPF ou CNPJ" required>
+            <button class="btn-acao" onclick="avancarParaMenu()">Avançar ➔</button>
+        </div>
+
+        <!-- TELA 2: Menu Principal -->
+        <div id="tela-menu" class="hidden">
+            <p>Olá, <b id="display-nome"></b>! Como podemos ajudar hoje?</p>
+            <div class="grid-1">
+                <button class="btn-opcao" onclick="escolherSetor('Produtos')">🍞 1. Produtos</button>
+                <button class="btn-opcao" onclick="escolherSetor('Equipamentos')">🛠️ 2. Equipamentos</button>
+                <button class="btn-opcao" onclick="escolherParceria()">💼 3. Banco de talentos</button>
+                <button class="btn-opcao" onclick="escolherFinanceiro()">📄 4. Financeiro e Outros</button>
+            </div>
+            <button class="btn-voltar" onclick="voltarPara('tela-identificacao', 'tela-menu')">Voltar e alterar dados</button>
+        </div>
+
+        <!-- TELA 3: Tipo de Cliente (Novo ou Atual) -->
+        <div id="tela-tipo-cliente" class="hidden">
+            <p>Sobre <b><span id="display-setor"></span></b>:<br>Você já é nosso cliente?</p>
+            <div class="grid-2">
+                <button class="btn-opcao" onclick="escolherTipoCliente('Atual')">Já sou cliente</button>
+                <button class="btn-opcao" onclick="escolherTipoCliente('Novo')">Sou cliente novo</button>
+            </div>
+            <button class="btn-voltar" onclick="voltarPara('tela-menu', 'tela-tipo-cliente')">Voltar ao menu anterior</button>
+        </div>
+
+        <!-- TELA 4: Região (Finaliza e redireciona) -->
+        <div id="tela-regiao" class="hidden">
+            <p>Quase lá! Para direcionarmos ao profissional certo, selecione a região do seu estabelecimento:</p>
+            <div class="grid-2">
+                <button class="btn-opcao" onclick="finalizarAtendimento('ZL', 'Zona Leste')">📍 Zona Leste</button>
+                <button class="btn-opcao" onclick="finalizarAtendimento('ZN', 'Zona Norte')">📍 Zona Norte</button>
+                <button class="btn-opcao" onclick="finalizarAtendimento('ZS', 'Zona Sul')">📍 Zona Sul</button>
+                <button class="btn-opcao" onclick="finalizarAtendimento('ZO', 'Zona Oeste')">📍 Zona Oeste</button>
+            </div>
+            <button class="btn-voltar" onclick="voltarPara('tela-tipo-cliente', 'tela-regiao')">Voltar ao menu anterior</button>
+        </div>
+    </div>
+
+    <script>
+        // --- BANCO DE DADOS DE LINKS E TELEFONES ---
+        const links = {
+            formularioParceiro: 'https://forms.gle/SUA_URL_AQUI',
+            whatsappFinanceiro: '5511989026562',
+            
+            // Números dos REPRESENTANTES (Para quem JÁ É cliente)
+            representantes: {
+                'Produtos': { 'ZL': '5511922220001', 'ZN': '5511922220002', 'ZS': '5511922220003', 'ZO': '5511922220004' },
+                'Equipamentos': { 'ZL': '5511911110001', 'ZN': '5511911110002', 'ZS': '5511911110003', 'ZO': '5511911110004' }
+            },
+            
+            // Números dos GESTORES (Para apresentação a clientes NOVOS)
+            gestores: {
+                'Produtos': { 'ZL': '5511988880001', 'ZN': '5511988880002', 'ZS': '5511988880003', 'ZO': '5511988880004' },
+                'Equipamentos': { 'ZL': '5511977770001', 'ZN': '5511977770002', 'ZS': '5511977770003', 'ZO': '5511977770004' }
+            }
+        };
+
+        // --- VARIÁVEIS DE MEMÓRIA ---
+        let cliente = { nome: '', documento: '', setor: '', tipo: '' };
+
+        // --- FUNÇÕES DE NAVEGAÇÃO ---
+        function avancarParaMenu() {
+            const inputNome = document.getElementById('input-nome').value.trim();
+            const inputDoc = document.getElementById('input-documento').value.trim();
+            
+            if(inputNome === '' || inputDoc === '') {
+                alert('Por favor, preencha seu Nome e Documento para continuar.');
+                return;
+            }
+
+            cliente.nome = inputNome;
+            cliente.documento = inputDoc;
+            
+            document.getElementById('display-nome').innerText = cliente.nome.split(' ')[0]; // Pega só o primeiro nome
+            
+            trocarTela('tela-identificacao', 'tela-menu');
+        }
+
+        function escolherSetor(setor) {
+            cliente.setor = setor;
+            document.getElementById('display-setor').innerText = setor;
+            trocarTela('tela-menu', 'tela-tipo-cliente');
+        }
+
+        function escolherTipoCliente(tipo) {
+            cliente.tipo = tipo; // 'Atual' ou 'Novo'
+            trocarTela('tela-tipo-cliente', 'tela-regiao');
+        }
+
+        // --- FUNÇÕES DE FINALIZAÇÃO (REDIRECIONAMENTO) ---
+        function finalizarAtendimento(siglaRegiao, nomeRegiao) {
+            let numeroDestino = '';
+            let textoMensagem = '';
+
+            // Se for cliente atual, vai para o Representante. Se for novo, vai para o Gestor.
+            if (cliente.tipo === 'Atual') {
+                numeroDestino = links.representantes[cliente.setor][siglaRegiao];
+                textoMensagem = `Olá! Meu nome é ${cliente.nome} (Doc: ${cliente.documento}). Sou cliente da ${nomeRegiao} e preciso falar sobre ${cliente.setor}.`;
+            } else {
+                numeroDestino = links.gestores[cliente.setor][siglaRegiao];
+                textoMensagem = `Olá! Meu nome é ${cliente.nome} (Doc: ${cliente.documento}). Tenho interesse em me tornar um novo cliente da ${nomeRegiao} para fornecimento de ${cliente.setor}. Gostaria de conhecer a apresentação!`;
+            }
+
+            redirecionarWhatsApp(numeroDestino, textoMensagem);
+        }
+
+        function escolherParceria() {
+            alert("Você será redirecionado para o nosso Formulário de Talentos e Parceiros.");
+            window.open('https://forms.cloud.microsoft/pages/responsepage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAMAAbK2m8dUMkNFUUs2N01LWDJYS0dGQzlKU1ZGUzNRSi4u&route=shorturl', '_blank');
+        }
+
+        function escolherFinanceiro() {
+            let textoMensagem = `Olá! Meu nome é ${cliente.nome} (Doc: ${cliente.documento}). Preciso de atendimento do setor Financeiro/Administrativo.`;
+            redirecionarWhatsApp(links.whatsappFinanceiro, textoMensagem);
+        }
+
+        // --- UTILIDADES ---
+        function trocarTela(telaAtual, proximaTela) {
+            document.getElementById(telaAtual).classList.add('hidden');
+            document.getElementById(proximaTela).classList.remove('hidden');
+        }
+
+        function voltarPara(telaDestino, telaAtual) {
+            document.getElementById(telaAtual).classList.add('hidden');
+            document.getElementById(telaDestino).classList.remove('hidden');
+        }
+
+        function redirecionarWhatsApp(numero, mensagem) {
+            const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>
